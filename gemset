@@ -57,6 +57,17 @@ gemset_remove() {
   fi
 }
 
+gemset_show() {
+  gemsetname="$1"
+  if [ -d "$target_dir/$gemsetname" ]; then
+    echo "gemset: $gemsetname"
+    GEM_HOME="$target_dir/$gemsetname" gem list
+  else
+    echo "There is no gemset named \"$gemsetname\", cannot show."
+    exit 2
+  fi
+}
+
 gemset_usage() {
   echo "gemset - manage different sets of Ruby gems."
   echo
@@ -65,6 +76,7 @@ gemset_usage() {
   echo "  gemset list                lists the existing gemsets."
   echo "  gemset create [NAME]       creates a new gemset"
   echo "  gemset remove [NAME]       removes an existing gemset"
+  echo "  gemset show [NAME]         shows the gems installed in a gemset"
   echo "  gemset use [NAME]          change to using an existing gemset"
   echo "  gemset help                displays usage information"
   echo
@@ -81,7 +93,7 @@ case "$command" in
     fi
     gemset_list
     ;;
-  use|create|remove)
+  use|create|remove|show)
     shift
     gemsetname="$1"
     if [ -z "$gemsetname" ]; then
