@@ -1,0 +1,100 @@
+#!/bin/sh
+
+set -e
+
+gemdir=$(ruby -rrubygems -e 'puts Gem.dir')
+target_dir=$(echo "$gemdir" | xargs dirname)
+ruby_version=$(echo "$gemdir" | xargs basename)
+
+if [ -e "$target_dir/$ruby_version" ] && ! [ -h "$target_dir/$ruby_version" ]; then
+  echo "$target_dir/$ruby_version is not a symlink, cannot continue."
+  exit 2
+fi
+
+gemset_list() {
+  for gemset in $(ls -1 $target_dir | grep -v "^$ruby_version$"); do
+    if [ "$target_dir/$ruby_version" -ef "$target_dir/$gemset" ]; then
+      echo "\033[0;32;40m* $gemset\033[m"
+    else
+      echo "  $gemset"
+    fi
+  done
+}
+
+gemset_use() {
+  gemsetname="$1"
+  if [ -e "$target_dir/$gemsetname" ]; then
+    rm -f "$target_dir/$ruby_version"
+    cd $target_dir && ln -s "$gemsetname" $ruby_version
+  else
+    echo "There is no gemset named \"$gemsetname\", cannot use it."
+    exit 2
+  fi
+}
+
+gemset_create() {
+  gemsetname="$1"
+  if [ -d "$target_dir/$gemsetname" ]; then
+    echo "There is already a gemset named \"$gemsetname\", cannot create."
+    exit 2
+  else
+    mkdir -p "$target_dir/$gemsetname"
+  fi
+}
+
+gemset_remove() {
+  gemsetname="$1"
+  if [ -d "$target_dir/$gemsetname" ]; then
+    if [ "$target_dir/$ruby_version" -ef "$target_dir/$gemsetname" ]; then
+      echo "Cannot remove current gemset. Change to another gemset before removing."
+      exit 2
+    else
+      rm -rf "$target_dir/$gemsetname"
+    fi
+  else
+    echo "There is no gemset named \"$gemsetname\", cannot remove."
+    exit 2
+  fi
+}
+
+gemset_usage() {
+  echo "gemset - manage different sets of Ruby gems."
+  echo
+  echo "Usage:"
+  echo
+  echo "  gemset list                lists the existing gemsets."
+  echo "  gemset create [NAME]       creates a new gemset"
+  echo "  gemset remove [NAME]       removes an existing gemset"
+  echo "  gemset use [NAME]          change to using an existing gemset"
+  echo "  gemset help                displays usage information"
+  echo
+}
+
+command="$1"
+
+case "$command" in
+  list)
+    shift
+    if ! [ -z "$@" ]; then
+      gemset_usage
+      exit 1
+    fi
+    gemset_list
+    ;;
+  use|create|remove)
+    shift
+    gemsetname="$1"
+    if [ -z "$gemsetname" ]; then
+      gemset_usage
+      exit 1
+    fi
+    gemset_"$command" "$gemsetname"
+    ;;
+  usage|help)
+    gemset_usage
+    ;;
+  *)
+    gemset_usage
+    exit 1
+    ;;
+esac
