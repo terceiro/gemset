@@ -4,6 +4,12 @@ gemset - manage different sets of Rubygems on your system
 
 gemset is a simple replacement for RVM gemsets.
 
+Installation
+------------
+
+Copy the ``gemset`` script into some directory in your $PATH (putting it
+in ``/usr/local/bin`` will do it).
+
 Usage
 -----
 
