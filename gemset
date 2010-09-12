@@ -6,10 +6,33 @@ gemdir=$(ruby -rrubygems -e 'puts Gem.dir')
 target_dir=$(echo "$gemdir" | xargs dirname)
 ruby_version=$(echo "$gemdir" | xargs basename)
 
-if [ -e "$target_dir/$ruby_version" ] && ! [ -h "$target_dir/$ruby_version" ]; then
-  echo "$target_dir/$ruby_version is not a symlink, cannot continue."
-  exit 2
-fi
+gemset_check() {
+  if [ -e "$target_dir/$ruby_version" ] && ! [ -h "$target_dir/$ruby_version" ]; then
+    echo "$target_dir/$ruby_version is not a symlink, cannot continue."
+    echo 'Try running `gemset setup` to prepare your system for using gemset.'
+    exit 2
+  fi
+}
+
+gemset_setup() {
+  if [ -h "$target_dir/$ruby_version" ]; then
+    echo "gemset is alreay set up. No further configuration needed."
+    exit 2
+  fi
+  if [ -d "$target_dir/$ruby_version" ]; then
+    if [ -d "$target_dir/default" ] ; then
+      echo "There is already a directory called \"default\" in $target_dir. Cannot continue."
+      exit 2
+    else
+      echo "Your current Rubygems environment was moved to a gemset named \"default\"."
+      mv "$target_dir/$ruby_version" "$target_dir/default"
+    fi
+  else
+    mkdir -p "$target_dir/default"
+  fi
+
+  gemset_use default
+}
 
 gemset_list() {
   for gemset in $(ls -1 $target_dir | grep -v "^$ruby_version$"); do
@@ -26,6 +49,7 @@ gemset_use() {
   if [ -e "$target_dir/$gemsetname" ]; then
     rm -f "$target_dir/$ruby_version"
     cd $target_dir && ln -s "$gemsetname" $ruby_version
+    echo "Now using gemset \"$gemsetname\"."
   else
     echo "There is no gemset named \"$gemsetname\", cannot use it."
     exit 2
@@ -84,14 +108,18 @@ gemset_usage() {
 
 command="$1"
 
+if [ "$command" != 'setup' ]; then
+  gemset_check
+fi
+
 case "$command" in
-  list)
+  list|setup)
     shift
     if ! [ -z "$@" ]; then
       gemset_usage
       exit 1
     fi
-    gemset_list
+    gemset_"$command"
     ;;
   use|create|remove|show)
     shift
