@@ -6,9 +6,13 @@ gemset is a simple replacement for RVM gemsets.
 
 Installation
 ------------
+  * From release tarball:
 
-Copy the ``gemset`` script into some directory in your $PATH (putting it
-in ``/usr/local/bin`` will do it).
+    $ ./configure && make && sudo make install
+
+  * From the git repository::
+
+    $ autoreconf -i && ./configure && make && sudo make install
 
 Usage
 -----
