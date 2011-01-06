@@ -18,8 +18,8 @@
 set -e
 
 gemdir=$(ruby -rrubygems -e 'puts Gem.dir')
-target_dir=$(echo "$gemdir" | xargs dirname)
-ruby_version=$(echo "$gemdir" | xargs basename)
+target_dir=$(dirname "$gemdir")
+ruby_version=$(basename "$gemdir")
 
 gemset_check() {
   if [ -e "$target_dir/$ruby_version" ] && ! [ -h "$target_dir/$ruby_version" ]; then
