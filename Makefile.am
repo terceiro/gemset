@@ -1,9 +1,6 @@
 dist_bin_SCRIPTS = gemset
+SUBDIRS = test
 EXTRA_DIST = \
-	test/run \
-	test/test_helper.rb \
-	test/gemset_create_test.rb \
-	test/gemset_list_test.rb \
 	README.rst
 
 man_MANS = gemset.1
@@ -12,4 +9,9 @@ CLEANFILES = $(man_MANS)
 gemset.1: README.rst
 	rst2man $< > $@
 
-TESTS = test/run
+distcheck-hook:
+	for test_file in test/run test/*.rb; do test -e $(distdir)/$$test_file || (echo "ERROR: $$test_file not found in the distribution"; exit 1); done
+
+test: check
+
+.PHONY: test

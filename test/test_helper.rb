@@ -2,21 +2,23 @@ require 'test/unit'
 require 'fileutils'
 require 'rbconfig'
 require 'shoulda'
+require 'tmpdir'
 
 class GemsetTest < Test::Unit::TestCase
 
-  GEMSET_ROOT = File.expand_path(File.dirname(__FILE__) + '/..')
-  GEM_HOME = File.join(File.expand_path(File.dirname(__FILE__)), '/tmp', RbConfig::CONFIG['ruby_version'])
-  GEM_HOME_PARENT = File.dirname(GEM_HOME)
+  SRCDIR = File.dirname(File.expand_path(File.dirname(__FILE__)))
 
   def setup
-    ENV['GEM_HOME'] = GEM_HOME
+    @tmpdir = Dir.mktmpdir
+    @gem_home = File.join(@tmpdir, 'gems', RbConfig::CONFIG['ruby_version'])
+    @tmp_stdout = File.join(@tmpdir, 'tmp.out')
+    @tmp_stderr = File.join(@tmpdir, 'tmp.err')
+
+    ENV['GEM_HOME'] = @gem_home
   end
 
   def teardown
-    FileUtils.rm_rf(GEM_HOME_PARENT)
-    FileUtils.rm_rf('tmp.out')
-    FileUtils.rm_rf('tmp.err')
+    FileUtils.rm_rf(@tmpdir)
   end
 
   def run(runner)
@@ -27,14 +29,14 @@ class GemsetTest < Test::Unit::TestCase
   protected
 
   def gemset(*args)
-    system("#{GEMSET_ROOT}/gemset #{args.join(' ')} >tmp.out 2>tmp.err")
+    system("#{SRCDIR}/gemset #{args.join(' ')} >#{@tmp_stdout} 2>#{@tmp_stderr}")
     if $?.is_a?(Fixnum)
       @exit_status = $?
     else
       @exit_status = $?.exitstatus
     end
-    @stdout = File.read('tmp.out')
-    @stderr = File.read('tmp.err')
+    @stdout = File.read(@tmp_stdout)
+    @stderr = File.read(@tmp_stderr)
   end
 
   def assert_directory_exists(path)
