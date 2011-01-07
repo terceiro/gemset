@@ -112,6 +112,7 @@ gemset_usage() {
   echo
   echo "Usage:"
   echo
+  echo "  gemset setup               sets up your environment for using gemsets."
   echo "  gemset list                lists the existing gemsets."
   echo "  gemset create [NAME]       creates a new gemset"
   echo "  gemset remove [NAME]       removes an existing gemset"
