@@ -59,6 +59,10 @@ gemset_list() {
   done
 }
 
+gemset_current() {
+  readlink "$target_dir/$ruby_version"
+}
+
 gemset_use() {
   gemsetname="$1"
   if [ -e "$target_dir/$gemsetname" ]; then
@@ -129,7 +133,7 @@ if [ "$command" != 'setup' ]; then
 fi
 
 case "$command" in
-  list|setup)
+  list|setup|current)
     shift
     if ! [ -z "$@" ]; then
       gemset_usage
