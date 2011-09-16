@@ -1,7 +1,7 @@
 require 'test/unit'
 require 'fileutils'
 require 'rbconfig'
-require 'shoulda'
+require 'shoulda-context'
 require 'tmpdir'
 
 class GemsetTest < Test::Unit::TestCase
