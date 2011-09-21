@@ -1,0 +1,10 @@
+Makefile
+Makefile.in
+aclocal.m4
+*.cache
+*.log
+*.status
+*.1
+missing
+install-sh
+configure
