@@ -10,11 +10,15 @@ class GemsetTest < Test::Unit::TestCase
 
   def setup
     @tmpdir = Dir.mktmpdir
-    @gem_home = File.join(@tmpdir, 'gems', RbConfig::CONFIG['ruby_version'])
     @tmp_stdout = File.join(@tmpdir, 'tmp.out')
     @tmp_stderr = File.join(@tmpdir, 'tmp.err')
 
-    ENV['GEM_HOME'] = @gem_home
+    ENV['HOME'] = @tmpdir
+    @gem_home = `ruby -rubygems -e 'puts Gem.user_dir'`.strip
+  end
+
+  def gemset_path(gemset)
+    File.join(File.dirname(@gem_home), gemset)
   end
 
   def teardown

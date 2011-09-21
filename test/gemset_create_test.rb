@@ -7,7 +7,7 @@ class GemsetCreateTest < GemsetTest
     end
 
     should 'first creating' do
-      assert_directory_exists File.expand_path(ENV['GEM_HOME'] + '/../test')
+      assert_directory_exists gemset_path('test')
     end
 
     should 'return an ok status' do

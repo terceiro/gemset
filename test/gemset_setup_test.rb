@@ -8,9 +8,9 @@ class GemsetSetupTest < GemsetTest
         gemset 'setup'
       end
       should 'create empty  "default" gemset' do
-        assert File.directory?(File.join(@tmpdir, 'gems', 'default'))
+        assert File.directory?(gemset_path('default'))
       end
-      should 'symlink default to GEM_HOME' do
+      should 'symlink gem_home to default gemset' do
         assert_equal 'default', File.readlink(@gem_home)
       end
       should 'return an ok status' do
@@ -21,11 +21,11 @@ class GemsetSetupTest < GemsetTest
     context 'with existing gem directory' do
       setup do
         FileUtils.mkdir_p @gem_home
-        FileUtils.touch(File.join(@gem_home, 'test'))
+        FileUtils.touch(gemset_path('test'))
         gemset 'setup'
       end
       should 'move the current GEM_HOME to "default" gemset' do
-        assert File.exists?(File.join(@tmpdir, 'gems', 'default', 'test'))
+        assert File.exists?(gemset_path('default'))
       end
       should 'return an ok status' do
         assert_exit_status 0
@@ -35,7 +35,7 @@ class GemsetSetupTest < GemsetTest
     context 'with existing gem directory and existing "default" gemset' do
       setup do
         FileUtils.mkdir_p @gem_home
-        FileUtils.mkdir_p File.join(@tmpdir, 'gems', 'default')
+        FileUtils.mkdir_p gemset_path('default')
         gemset 'setup'
       end
       should 'complain' do
@@ -49,7 +49,7 @@ class GemsetSetupTest < GemsetTest
 
     context 'already set up' do
       setup do
-        FileUtils.mkdir_p File.join(@tmpdir, 'gems')
+        FileUtils.mkdir_p File.dirname(@gem_home)
         File.symlink 'default', @gem_home
         gemset 'setup'
       end

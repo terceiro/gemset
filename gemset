@@ -17,7 +17,7 @@
 
 set -e
 
-gemdir=$(ruby -rrubygems -e 'puts Gem.dir')
+gemdir=$(ruby -rrubygems -e 'puts Gem.user_dir')
 target_dir=$(dirname "$gemdir")
 ruby_version=$(basename "$gemdir")
 
