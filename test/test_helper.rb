@@ -18,12 +18,13 @@ class GemsetTest < Test::Unit::TestCase
     @tmp_stderr = File.join(@tmpdir, 'tmp.err')
 
     ENV['HOME'] = @tmpdir
-    @gem_home = `ruby -rubygems -e 'puts Gem.user_dir'`.strip
 
     # symlink current Ruby program into SRCDIR so that calling ruby from gemset
     # calls the current ruby
     ruby = File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])
     FileUtils.ln_sf(ruby, File.join(SRCDIR, 'ruby'))
+
+    @gem_home = `ruby -rubygems -e 'puts Gem.user_dir'`.strip
   end
 
   def teardown
