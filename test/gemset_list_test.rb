@@ -6,6 +6,7 @@ class GemsetListTest < GemsetTest
     should 'list no gemsets' do
       gemset 'list'
       assert_output_matches /^$/
+      assert_stderr_matches /^$/
     end
   end
 

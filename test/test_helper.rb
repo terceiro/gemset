@@ -55,6 +55,10 @@ class GemsetTest < Test::Unit::TestCase
     assert_match(regex, @stdout)
   end
 
+  def assert_stderr_matches(regex)
+    assert_match(regex, @stderr)
+  end
+
   def assert_failure_exit_status
     assert @exit_status > 0, 'exit status expected to be > 0'
   end

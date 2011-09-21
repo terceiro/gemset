@@ -50,6 +50,9 @@ gemset_setup() {
 }
 
 gemset_list() {
+  if ! test -d "$target_dir"; then
+    return
+  fi
   for gemset in $(ls -1 $target_dir | grep -v "^$ruby_version$"); do
     if [ "$target_dir/$ruby_version" -ef "$target_dir/$gemset" ]; then
       echo "\033[0;32;40m* $gemset\033[m"
