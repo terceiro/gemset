@@ -1,0 +1,2 @@
+* identify gemsets with ruby engine/version: gemsets created with ruby1.8 are
+  not listed when running gemset with ruby 1.9
