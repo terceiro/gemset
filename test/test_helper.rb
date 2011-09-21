@@ -3,10 +3,14 @@ require 'fileutils'
 require 'rbconfig'
 require 'shoulda-context'
 require 'tmpdir'
+require 'rbconfig'
+
+$GEMSET_SRCDIR = File.dirname(File.expand_path(File.dirname(__FILE__)))
+ENV['PATH'] = [$GEMSET_SRCDIR, ENV['PATH']].join(':')
 
 class GemsetTest < Test::Unit::TestCase
 
-  SRCDIR = File.dirname(File.expand_path(File.dirname(__FILE__)))
+  SRCDIR = $GEMSET_SRCDIR
 
   def setup
     @tmpdir = Dir.mktmpdir
@@ -15,13 +19,15 @@ class GemsetTest < Test::Unit::TestCase
 
     ENV['HOME'] = @tmpdir
     @gem_home = `ruby -rubygems -e 'puts Gem.user_dir'`.strip
-  end
 
-  def gemset_path(gemset)
-    File.join(File.dirname(@gem_home), gemset)
+    # symlink current Ruby program into SRCDIR so that calling ruby from gemset
+    # calls the current ruby
+    ruby = File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['ruby_install_name'])
+    FileUtils.ln_sf(ruby, File.join(SRCDIR, 'ruby'))
   end
 
   def teardown
+    FileUtils.rm_r(File.join(SRCDIR, 'ruby'))
     FileUtils.rm_rf(@tmpdir)
   end
 
@@ -42,6 +48,11 @@ class GemsetTest < Test::Unit::TestCase
     @stdout = File.read(@tmp_stdout)
     @stderr = File.read(@tmp_stderr)
   end
+
+  def gemset_path(gemset)
+    File.join(File.dirname(@gem_home), gemset)
+  end
+
 
   def assert_directory_exists(path)
     assert File.directory?(path), "No such directory: #{path}"

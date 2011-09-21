@@ -6,7 +6,7 @@ class GemsetCreateTest < GemsetTest
       gemset 'create test'
     end
 
-    should 'first creating' do
+    should 'actually create' do
       assert_directory_exists gemset_path('test')
     end
 
