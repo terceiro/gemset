@@ -6,8 +6,8 @@ EXTRA_DIST = \
 man_MANS = gemset.1
 CLEANFILES = $(man_MANS)
 
-gemset.1: README.rst
-	rst2man $< > $@
+gemset.1: README.pod
+	pod2man $< > $@
 
 distcheck-hook:
 	for test_file in test/run test/*.rb; do test -e $(distdir)/$$test_file || (echo "ERROR: $$test_file not found in the distribution"; exit 1); done
