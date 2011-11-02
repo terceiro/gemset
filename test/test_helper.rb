@@ -51,7 +51,7 @@ class GemsetTest < Test::Unit::TestCase
   end
 
   def gemset_path(gemset)
-    File.join(File.dirname(@gem_home), gemset)
+    @gem_home + '@' + gemset
   end
 
 

@@ -3,6 +3,7 @@ require 'test_helper'
 class GemsetCreateTest < GemsetTest
   context 'create' do
     setup do
+      gemset 'setup'
       gemset 'create test'
     end
 

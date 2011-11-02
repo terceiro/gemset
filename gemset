@@ -22,7 +22,7 @@ target_dir=$(dirname "$gemdir")
 ruby_version=$(basename "$gemdir")
 
 gemset_check() {
-  if [ -e "$target_dir/$ruby_version" ] && ! [ -h "$target_dir/$ruby_version" ]; then
+  if [ ! -e "$target_dir/$ruby_version" ] || [ -e "$target_dir/$ruby_version" ] && ! [ -h "$target_dir/$ruby_version" ]; then
     echo "$target_dir/$ruby_version is not a symlink, cannot continue."
     echo 'Try running `gemset setup` to prepare your system for using gemset.'
     exit 2
@@ -35,15 +35,15 @@ gemset_setup() {
     exit 2
   fi
   if [ -d "$target_dir/$ruby_version" ]; then
-    if [ -d "$target_dir/default" ] ; then
+    if [ -d "$target_dir/$ruby_version@default" ] ; then
       echo "There is already a directory called \"default\" in $target_dir. Cannot continue."
       exit 2
     else
+      mv "$target_dir/$ruby_version" "$target_dir/$ruby_version@default"
       echo "Your current Rubygems environment was moved to a gemset named \"default\"."
-      mv "$target_dir/$ruby_version" "$target_dir/default"
     fi
   else
-    mkdir -p "$target_dir/default"
+    mkdir -p "$target_dir/$ruby_version@default"
   fi
 
   gemset_use default
@@ -53,8 +53,8 @@ gemset_list() {
   if ! test -d "$target_dir"; then
     return
   fi
-  for gemset in $(ls -1 $target_dir | grep -v "^$ruby_version$"); do
-    if [ "$target_dir/$ruby_version" -ef "$target_dir/$gemset" ]; then
+  for gemset in $(ls -1 $target_dir | sed "/^$ruby_version@/!d; s/.*@//"); do
+    if [ "$target_dir/$ruby_version" -ef "$target_dir/$ruby_version@$gemset" ]; then
       echo "\033[0;32;40m* $gemset\033[m"
     else
       echo "  $gemset"
@@ -63,14 +63,14 @@ gemset_list() {
 }
 
 gemset_current() {
-  readlink "$target_dir/$ruby_version"
+  readlink "$target_dir/$ruby_version" | sed 's/.*@//'
 }
 
 gemset_use() {
   gemsetname="$1"
-  if [ -e "$target_dir/$gemsetname" ]; then
+  if [ -e "$target_dir/$ruby_version@$gemsetname" ]; then
     rm -f "$target_dir/$ruby_version"
-    cd $target_dir && ln -s "$gemsetname" $ruby_version
+    cd $target_dir && ln -s "$ruby_version@$gemsetname" $ruby_version
     echo "Now using gemset \"$gemsetname\"."
   else
     echo "There is no gemset named \"$gemsetname\", cannot use it."
@@ -80,22 +80,22 @@ gemset_use() {
 
 gemset_create() {
   gemsetname="$1"
-  if [ -d "$target_dir/$gemsetname" ]; then
+  if [ -d "$target_dir/$ruby_version@$gemsetname" ]; then
     echo "There is already a gemset named \"$gemsetname\", cannot create."
     exit 2
   else
-    mkdir -p "$target_dir/$gemsetname"
+    mkdir -p "$target_dir/$ruby_version@$gemsetname"
   fi
 }
 
 gemset_remove() {
   gemsetname="$1"
-  if [ -d "$target_dir/$gemsetname" ]; then
-    if [ "$target_dir/$ruby_version" -ef "$target_dir/$gemsetname" ]; then
+  if [ -d "$target_dir/$ruby_version@$gemsetname" ]; then
+    if [ "$target_dir/$ruby_version" -ef "$target_dir/$ruby_version@$gemsetname" ]; then
       echo "Cannot remove current gemset. Change to another gemset before removing."
       exit 2
     else
-      rm -rf "$target_dir/$gemsetname"
+      rm -rf "$target_dir/$ruby_version@$gemsetname"
     fi
   else
     echo "There is no gemset named \"$gemsetname\", cannot remove."
@@ -105,9 +105,9 @@ gemset_remove() {
 
 gemset_show() {
   gemsetname="$1"
-  if [ -d "$target_dir/$gemsetname" ]; then
+  if [ -d "$target_dir/$ruby_version@$gemsetname" ]; then
     echo "gemset: $gemsetname"
-    GEM_HOME="$target_dir/$gemsetname" gem list
+    GEM_HOME="$target_dir/$ruby_version@$gemsetname" gem list
   else
     echo "There is no gemset named \"$gemsetname\", cannot show."
     exit 2

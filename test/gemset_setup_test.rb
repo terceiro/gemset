@@ -11,7 +11,7 @@ class GemsetSetupTest < GemsetTest
         assert File.directory?(gemset_path('default'))
       end
       should 'symlink gem_home to default gemset' do
-        assert_equal 'default', File.readlink(@gem_home)
+        assert_match /@default$/, File.readlink(@gem_home)
       end
       should 'return an ok status' do
         assert_exit_status 0
