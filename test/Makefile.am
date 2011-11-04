@@ -5,5 +5,5 @@ RUBIES = ruby1.8 ruby1.9.1
 check-local: $(patsubst %, check-%, $(RUBIES))
 
 check-%:
-	$* -S rake -f @abs_srcdir@/run
+	$* @abs_srcdir@/runtests.rb
 	$(RM) -r @abs_srcdir@/.rbx
