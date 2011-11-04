@@ -17,9 +17,11 @@
 
 set -e
 
-gemdir=$(ruby -rrubygems -e 'puts Gem.user_dir')
-target_dir=$(dirname "$gemdir")
-ruby_version=$(basename "$gemdir")
+gemset_bootstrap() {
+  gemdir=$(ruby -rrubygems -e 'puts Gem.user_dir')
+  target_dir=$(dirname "$gemdir")
+  ruby_version=$(basename "$gemdir")
+}
 
 gemset_check() {
   if [ ! -e "$target_dir/$ruby_version" ] || [ -e "$target_dir/$ruby_version" ] && ! [ -h "$target_dir/$ruby_version" ]; then
@@ -130,13 +132,7 @@ gemset_usage() {
 }
 
 command="$1"
-
-if [ "$command" != 'setup' ] && [ "$command" != 'commands' ]; then
-  gemset_check
-fi
-
-case "$command" in
-  commands)
+if [ "$command" = 'commands' ]; then
     echo commands
     echo create
     echo current
@@ -145,9 +141,29 @@ case "$command" in
     echo remove
     echo setup
     echo show
-    echo usage
     echo use
-    ;;
+    exit 0
+fi
+if [ "$command" = 'completions' ]; then
+  completions_for="$2"
+  case "$completions_for" in
+    use|remove|show)
+      gemset_bootstrap
+      ls -1 "$target_dir" | sed "/^$ruby_version@/!d; s/.*@//"
+      ;;
+    *)
+      ;;
+  esac
+  exit 0
+fi
+
+gemset_bootstrap
+
+if [ "$command" != 'setup' ]; then
+  gemset_check
+fi
+
+case "$command" in
   list|setup|current)
     shift
     if ! [ -z "$@" ]; then
@@ -165,7 +181,7 @@ case "$command" in
     fi
     gemset_"$command" "$gemsetname"
     ;;
-  usage|help)
+  help)
     gemset_usage
     ;;
   *)
