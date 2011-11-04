@@ -131,11 +131,23 @@ gemset_usage() {
 
 command="$1"
 
-if [ "$command" != 'setup' ]; then
+if [ "$command" != 'setup' ] && [ "$command" != 'commands' ]; then
   gemset_check
 fi
 
 case "$command" in
+  commands)
+    echo commands
+    echo create
+    echo current
+    echo help
+    echo list
+    echo remove
+    echo setup
+    echo show
+    echo usage
+    echo use
+    ;;
   list|setup|current)
     shift
     if ! [ -z "$@" ]; then
