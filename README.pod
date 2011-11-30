@@ -116,6 +116,13 @@ Inspecting gemset capabilities:
     gemset use [NAME]          change to using an existing gemset
     gemset help                displays usage information
 
+=head1 Hacking
+
+To run the tests:
+
+  $ bundle install
+  $ ruby test/runtests.rb
+
 =head1 Copyright
 
 Copyright © 2010-2011, Antonio Terceiro <terceiro@softwarelivre.org>
