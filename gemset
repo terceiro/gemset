@@ -18,7 +18,10 @@
 set -e
 
 gemset_bootstrap() {
-  gemdir=$(ruby -rrubygems -e 'puts Gem.user_dir')
+  gemdir=$(ruby -rrubygems -e 'puts Gem.dir')
+  if [ ! -w "$gemdir" ]; then
+    gemdir=$(ruby -rrubygems -e 'puts Gem.user_dir')
+  fi
   target_dir=$(dirname "$gemdir")
   ruby_version=$(basename "$gemdir")
 }
