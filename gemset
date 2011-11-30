@@ -130,6 +130,9 @@ gemset_usage() {
   echo "  gemset remove [NAME]       removes an existing gemset"
   echo "  gemset show [NAME]         shows the gems installed in a gemset"
   echo "  gemset use [NAME]          change to using an existing gemset"
+  echo "  gemset run COMMAND [ARGS]  runs COMMAND with GEM_HOME pointing to current gemset"
+  echo "                             (this will force both rubygems and bundler to install"
+  echo "                             gems in your \$HOME directory instead of system-wide)"
   echo "  gemset help                displays usage information"
   echo
 }
@@ -145,6 +148,7 @@ if [ "$command" = 'commands' ]; then
     echo setup
     echo show
     echo use
+    echo run
     exit 0
 fi
 if [ "$command" = 'completions' ]; then
@@ -183,6 +187,10 @@ case "$command" in
       exit 1
     fi
     gemset_"$command" "$gemsetname"
+    ;;
+  run)
+    shift
+    GEM_HOME="$gemdir" exec $@
     ;;
   help)
     gemset_usage
