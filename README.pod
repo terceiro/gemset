@@ -1,14 +1,33 @@
 =head1 gemset - manage different sets of Rubygems on your system
 
-gemset is a simple replacement for RVM gemsets.
+gemset is a simple solution for having different sets of Rubygems
+installed, and switching between them.
+
+=head1 Features/Bugs
+
+Works no matter which interactive shell you use: bash, zsh, csh, tcsh,
+fish etc, are all welcome.
+
+Works outside of interactive shells. For example, if you change your
+default gemset even GUI applications started without a shell will have
+access to that gemset you changed to.
+
+Works with Bundler.
+
+It only depends on having I<ruby> in your $PATH.  If you want to manage
+the installations of different ruby interpreters, you can use rbenv or
+RVM. gemset will manage gem sets for the current I<ruby>, so each
+interpreter have its separate gem sets.
 
 =head1 Installation
 
-From release tarball:
+Simplest method: just copy the I<gemset> script into your I<$PATH>.
+
+You can also install using GNU autotools, using a release tarball:
 
   $ ./configure && make && sudo make install
 
-From the git repository:
+Or from the git repository (you will need autoreconf):
 
   $ autoreconf -i && ./configure && make && sudo make install
 
@@ -96,28 +115,6 @@ Inspecting gemset capabilities:
     gemset show [NAME]         shows the gems installed in a gemset
     gemset use [NAME]          change to using an existing gemset
     gemset help                displays usage information
-
-=head1 Features
-
-Works no matter which interactive shell you use: bash, zsh, csh, tcsh,
-fish etc, are all welcome.
-
-Works outside of interactive shells. For example, if you change your
-default gemset even GUI applications started without a shell will have
-access to that gemset you changed to. This can also be considered a
-bug.
-
-Respects I<Gem.user_dir> (will manage gemsets in I<#{Gem.user_dir}/..>).
-
-Works with Bundler.
-
-=head1 Limitations
-
-Does not deal with the issue of multiple ruby interpreters being
-installed. (although if you manage to change which interpreter is
-called by the ``ruby`` binary, it should work). If you want to manage
-different ruby interpreter installation, you should use RVM or
-something else instead.
 
 =head1 Copyright
 
